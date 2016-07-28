@@ -16,4 +16,6 @@
     <string name="organization_label">Organization</string>
     <string name="set_contact_info_btn_lbl">Set</string>
     <string name="title_activity_nfcdisplay">NFCDisplayActivity</string>
+    <string name="send_apk">Send APK</string>
+    <string name="title_activity_send_apk">SendApkActivity</string>
 </resources>
