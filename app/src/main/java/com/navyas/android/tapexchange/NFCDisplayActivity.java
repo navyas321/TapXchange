@@ -1,21 +1,25 @@
-package com.gankmobile.android.tapexchange;
+package com.navyas.android.tapexchange;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +36,28 @@ public class NFCDisplayActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfcdisplay);
 
+        android.support.v7.app.ActionBar menu = getSupportActionBar();
+
+        TextView tv = new TextView(getApplicationContext());
+
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                ActionBar.LayoutParams.MATCH_PARENT,
+                ActionBar.LayoutParams.WRAP_CONTENT);
+
+        tv.setLayoutParams(lp);
+        tv.setText(menu.getTitle());
+        tv.setTextColor(Color.WHITE);
+        Typeface type = Typeface.createFromAsset(getAssets(),"Dashley.ttf");
+        tv.setTypeface(type);
+        tv.setTextSize(30);
+
+        menu.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        menu.setCustomView(tv);
+
+        menu.setDisplayShowHomeEnabled(true);
+        menu.setLogo(R.mipmap.ictapxchangelauncher);
+        menu.setDisplayUseLogoEnabled(true);
+
         fullName = (TextView) findViewById(R.id.full_name_text2);
         phoneNum = (TextView) findViewById(R.id.phone_num_text2);
         emailAddr = (TextView) findViewById(R.id.email_text2);
@@ -39,6 +65,7 @@ public class NFCDisplayActivity extends ActionBarActivity {
         organization = (TextView) findViewById(R.id.organization_text2);
 
         mSaveButton = (Button) findViewById(R.id.save_button);
+        mSaveButton.setTypeface(type);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,20 +140,24 @@ public class NFCDisplayActivity extends ActionBarActivity {
         //Email will be inserted as well
         cntProOper.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)//Step2
                 .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contactIndex)
-                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-                .withValue(ContactsContract.CommonDataKinds.Email.DISPLAY_NAME, email).build());
+                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.Email.DATA, email)
+                .withValue(ContactsContract.CommonDataKinds.Email.TYPE, null)
+                .build());
 
         // Insert nickname into contact
         cntProOper.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)//Step2
                 .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,contactIndex)
-                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE)
                 .withValue(ContactsContract.CommonDataKinds.Nickname.NAME, nickname).build());
 
         // Organization
         cntProOper.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)//Step2
                 .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contactIndex)
-                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-                .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, organization).build());
+                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, organization)
+                .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+                .build());
         try
         {
             // We will do batch operation to insert all above data

@@ -1,26 +1,21 @@
-package com.gankmobile.android.tapexchange;
+package com.navyas.android.tapexchange;
 
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
-import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
-import android.os.RemoteException;
-import android.provider.ContactsContract;
-import android.support.v7.app.ActionBarActivity;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 
 public class SetContactActivity extends ActionBarActivity {
@@ -39,6 +34,28 @@ public class SetContactActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_contact);
+
+        android.support.v7.app.ActionBar menu = getSupportActionBar();
+
+        TextView tv = new TextView(getApplicationContext());
+
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                ActionBar.LayoutParams.MATCH_PARENT,
+                ActionBar.LayoutParams.WRAP_CONTENT);
+
+        tv.setLayoutParams(lp);
+        tv.setText(menu.getTitle());
+        tv.setTextColor(Color.WHITE);
+        Typeface type = Typeface.createFromAsset(getAssets(),"Dashley.ttf");
+        tv.setTypeface(type);
+        tv.setTextSize(30);
+
+        menu.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        menu.setCustomView(tv);
+
+        menu.setDisplayShowHomeEnabled(true);
+        menu.setLogo(R.mipmap.ictapxchangelauncher);
+        menu.setDisplayUseLogoEnabled(true);
 
         serializer = new JSONSerializer(getApplicationContext(), "encoded_contact_info.json", new String[] {"code"});
         boolean successfulLoad = ObtainJSONObject();
@@ -69,6 +86,7 @@ public class SetContactActivity extends ActionBarActivity {
 
 
         mSetInfoButton = (Button) findViewById(R.id.set_button);
+        mSetInfoButton.setTypeface(type);
         mSetInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

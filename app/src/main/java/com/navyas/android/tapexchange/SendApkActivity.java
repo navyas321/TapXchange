@@ -1,13 +1,18 @@
-package com.gankmobile.android.tapexchange;
+package com.navyas.android.tapexchange;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -21,8 +26,28 @@ public class SendApkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_apk);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        android.support.v7.app.ActionBar menu = getSupportActionBar();
+
+        TextView tv = new TextView(getApplicationContext());
+
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                ActionBar.LayoutParams.MATCH_PARENT,
+                ActionBar.LayoutParams.WRAP_CONTENT);
+
+        tv.setLayoutParams(lp);
+        tv.setText("TapXchange");
+        tv.setTextColor(Color.WHITE);
+        Typeface type = Typeface.createFromAsset(getAssets(),"Dashley.ttf");
+        tv.setTypeface(type);
+        tv.setTextSize(30);
+
+        menu.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        menu.setCustomView(tv);
+
+        menu.setDisplayShowHomeEnabled(true);
+        menu.setLogo(R.mipmap.ictapxchangelauncher);
+        menu.setDisplayUseLogoEnabled(true);
 
         PackageManager pm = this.getPackageManager();
         // Check whether NFC is available on device

@@ -1,4 +1,4 @@
-package com.gankmobile.android.tapexchange;
+package com.navyas.android.tapexchange;
 
 import android.content.Context;
 
