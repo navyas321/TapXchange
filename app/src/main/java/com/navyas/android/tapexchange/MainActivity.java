@@ -1,6 +1,8 @@
 package com.navyas.android.tapexchange;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -10,11 +12,11 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -35,6 +37,7 @@ public class MainActivity extends ActionBarActivity implements NfcAdapter.Create
     JSONSerializer serializer;
     JSONObject obj;
     String apk = "tapexchange";
+    private static final int REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,52 +67,113 @@ public class MainActivity extends ActionBarActivity implements NfcAdapter.Create
         menu.setLogo(R.mipmap.ictapxchangelauncher);
         menu.setDisplayUseLogoEnabled(true);
 
-        NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
-        final NfcAdapter mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if(mAdapter == null || mNfcAdapter == null)
-        {
-            return;
-        }
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED) {
 
-        if(!mAdapter.isEnabled() || !mNfcAdapter.isEnabled())
-        {
-            Toast.makeText(this, "Please Enable NFC", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
-        }
-
-        mAdapter.setNdefPushMessageCallback(this, this);
-
-        mSetInfoButton = (Button) findViewById(R.id.set_contact_info_btn);
-        mSetInfoButton.setTypeface(type);
-        mSetInfoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), SetContactActivity.class));
+            NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
+            final NfcAdapter mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+            if (mAdapter == null || mNfcAdapter == null) {
+                return;
             }
-        });
 
-        mSendApkButton = (Button) findViewById(R.id.send_apk);
-        mSendApkButton.setTypeface(type);
-        mSendApkButton.setOnClickListener(new  View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-                mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-                final List pkgAppsList = getPackageManager().queryIntentActivities(mainIntent, 0);
-                for (Object object : pkgAppsList) {
-                    ResolveInfo info = (ResolveInfo) object;
-                    File file = new File(info.activityInfo.applicationInfo.publicSourceDir);
-                    //Log.e("TAGS",file.toString());
-                    if(file.toString().contains(apk)) {
-                        //Log.e("TAG0",file.toString());
-                        Intent intent = new Intent(v.getContext(), SendApkActivity.class);
-                        intent.putExtra("file", file);
-                        startActivity(intent);
+            if (!mAdapter.isEnabled() || !mNfcAdapter.isEnabled()) {
+                Toast.makeText(this, "Please Enable NFC", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+            }
 
+            mAdapter.setNdefPushMessageCallback(this, this);
+
+            mSetInfoButton = (Button) findViewById(R.id.set_contact_info_btn);
+            mSetInfoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(getApplicationContext(), SetContactActivity.class));
+                }
+            });
+
+            mSendApkButton = (Button) findViewById(R.id.send_apk);
+            mSendApkButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+                    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    final List pkgAppsList = getPackageManager().queryIntentActivities(mainIntent, 0);
+                    for (Object object : pkgAppsList) {
+                        ResolveInfo info = (ResolveInfo) object;
+                        File file = new File(info.activityInfo.applicationInfo.publicSourceDir);
+                        //Log.e("TAGS",file.toString());
+                        if (file.toString().contains(apk)) {
+                            //Log.e("TAG0",file.toString());
+                            Intent intent = new Intent(v.getContext(), SendApkActivity.class);
+                            intent.putExtra("file", file);
+                            startActivity(intent);
+
+                        }
                     }
                 }
+            });
+        }
+
+        else {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_CONTACTS)) {
+                Toast.makeText(this, "Permission Required To Write Contacts", Toast.LENGTH_SHORT).show();
             }
-        });
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_CONTACTS}, REQUEST_CODE);
+
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_CODE) {
+            NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
+            final NfcAdapter mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+            if (mAdapter == null || mNfcAdapter == null) {
+                return;
+            }
+
+            if (!mAdapter.isEnabled() || !mNfcAdapter.isEnabled()) {
+                Toast.makeText(this, "Please Enable NFC", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+            }
+
+            mAdapter.setNdefPushMessageCallback(this, this);
+
+            mSetInfoButton = (Button) findViewById(R.id.set_contact_info_btn);
+            mSetInfoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(getApplicationContext(), SetContactActivity.class));
+                }
+            });
+
+            mSendApkButton = (Button) findViewById(R.id.send_apk);
+            mSendApkButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+                    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    final List pkgAppsList = getPackageManager().queryIntentActivities(mainIntent, 0);
+                    for (Object object : pkgAppsList) {
+                        ResolveInfo info = (ResolveInfo) object;
+                        File file = new File(info.activityInfo.applicationInfo.publicSourceDir);
+                        //Log.e("TAGS",file.toString());
+                        if (file.toString().contains(apk)) {
+                            //Log.e("TAG0",file.toString());
+                            Intent intent = new Intent(v.getContext(), SendApkActivity.class);
+                            intent.putExtra("file", file);
+                            startActivity(intent);
+
+                        }
+                    }
+                }
+            });
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
 
@@ -155,27 +219,7 @@ public class MainActivity extends ActionBarActivity implements NfcAdapter.Create
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
 }
 

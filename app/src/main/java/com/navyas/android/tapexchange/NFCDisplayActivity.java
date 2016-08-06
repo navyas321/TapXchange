@@ -1,22 +1,24 @@
 package com.navyas.android.tapexchange;
 
+import android.Manifest;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -30,6 +32,7 @@ public class NFCDisplayActivity extends ActionBarActivity {
 
     TextView fullName, phoneNum, emailAddr, nickname, organization;
     Button mSaveButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,7 @@ public class NFCDisplayActivity extends ActionBarActivity {
                 ActionBar.LayoutParams.WRAP_CONTENT);
 
         tv.setLayoutParams(lp);
-        tv.setText(menu.getTitle());
+        tv.setText("Save Contact Info");
         tv.setTextColor(Color.WHITE);
         Typeface type = Typeface.createFromAsset(getAssets(),"Dashley.ttf");
         tv.setTypeface(type);
@@ -54,9 +57,7 @@ public class NFCDisplayActivity extends ActionBarActivity {
         menu.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         menu.setCustomView(tv);
 
-        menu.setDisplayShowHomeEnabled(true);
-        menu.setLogo(R.mipmap.ictapxchangelauncher);
-        menu.setDisplayUseLogoEnabled(true);
+        menu.setDisplayHomeAsUpEnabled(true);
 
         fullName = (TextView) findViewById(R.id.full_name_text2);
         phoneNum = (TextView) findViewById(R.id.phone_num_text2);
@@ -65,18 +66,31 @@ public class NFCDisplayActivity extends ActionBarActivity {
         organization = (TextView) findViewById(R.id.organization_text2);
 
         mSaveButton = (Button) findViewById(R.id.save_button);
-        mSaveButton.setTypeface(type);
-        mSaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                WritePhoneContact(fullName.getText() + "", phoneNum.getText() + "", emailAddr.getText() + "", nickname.getText() + "", organization.getText() + "");
+            mSaveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(i);
-                finish();
-            }
-        });
-    }
+                    if (ContextCompat.checkSelfPermission(NFCDisplayActivity.this,
+                            Manifest.permission.WRITE_CONTACTS)
+                            == PackageManager.PERMISSION_GRANTED ) {
+                        WritePhoneContact(fullName.getText() + "", phoneNum.getText() + "", emailAddr.getText() + "", nickname.getText() + "", organization.getText() + "");
+                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(i);
+                        finish();
+
+                    } else {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(NFCDisplayActivity.this, Manifest.permission.WRITE_CONTACTS)) {
+                            Toast.makeText(v.getContext(), "Permission Required To Write Contacts", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                }
+            });
+        }
+
+
+
+
 
     @Override
     protected void onResume()
@@ -93,13 +107,6 @@ public class NFCDisplayActivity extends ActionBarActivity {
 
             String[] contactItems = encodedContact.split("\n");
 
-//            for(int i = 0; i < contactItems.length; i++)
-//            {
-//                if(contactItems[i].equals("&"))
-//                {
-//                    contactItems[i] = "";
-//                }
-//            }
 
             fullName.setText(contactItems[0]);
             phoneNum.setText(contactItems[1]);
@@ -108,6 +115,7 @@ public class NFCDisplayActivity extends ActionBarActivity {
             organization.setText(contactItems[4]);
         }
     }
+
 
 
     public void WritePhoneContact(String displayName, String number, String email, String nickname, String organization)
@@ -176,25 +184,5 @@ public class NFCDisplayActivity extends ActionBarActivity {
             Toast.makeText(getApplicationContext(), "Something went wrong, yo", Toast.LENGTH_SHORT).show();
         }
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_nfcdisplay, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

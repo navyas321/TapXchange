@@ -36,7 +36,7 @@ public class SendApkActivity extends AppCompatActivity {
                 ActionBar.LayoutParams.WRAP_CONTENT);
 
         tv.setLayoutParams(lp);
-        tv.setText("TapXchange");
+        tv.setText("Send APP");
         tv.setTextColor(Color.WHITE);
         Typeface type = Typeface.createFromAsset(getAssets(),"Dashley.ttf");
         tv.setTypeface(type);
@@ -45,9 +45,7 @@ public class SendApkActivity extends AppCompatActivity {
         menu.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         menu.setCustomView(tv);
 
-        menu.setDisplayShowHomeEnabled(true);
-        menu.setLogo(R.mipmap.ictapxchangelauncher);
-        menu.setDisplayUseLogoEnabled(true);
+        menu.setDisplayHomeAsUpEnabled(true);
 
         PackageManager pm = this.getPackageManager();
         // Check whether NFC is available on device
@@ -92,6 +90,7 @@ public class SendApkActivity extends AppCompatActivity {
                     new Uri[]{Uri.fromFile(fileToTransfer)}, this);
         }
     }
+
 
 
 }

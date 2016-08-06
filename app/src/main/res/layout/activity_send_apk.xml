@@ -6,6 +6,9 @@
     android:padding="16dp"
     android:background="#E0F2F1">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <TextView android:text="@string/instructions"
         android:layout_width="wrap_content"
         style="@android:style/TextAppearance.Large"
@@ -13,4 +16,5 @@
         android:layout_gravity="center"
         />
 
+    </ScrollView>
 </RelativeLayout>

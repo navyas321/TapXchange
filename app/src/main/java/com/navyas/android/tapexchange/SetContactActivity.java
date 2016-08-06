@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -44,7 +42,7 @@ public class SetContactActivity extends ActionBarActivity {
                 ActionBar.LayoutParams.WRAP_CONTENT);
 
         tv.setLayoutParams(lp);
-        tv.setText(menu.getTitle());
+        tv.setText("Set Contact Info");
         tv.setTextColor(Color.WHITE);
         Typeface type = Typeface.createFromAsset(getAssets(),"Dashley.ttf");
         tv.setTypeface(type);
@@ -53,9 +51,8 @@ public class SetContactActivity extends ActionBarActivity {
         menu.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         menu.setCustomView(tv);
 
-        menu.setDisplayShowHomeEnabled(true);
-        menu.setLogo(R.mipmap.ictapxchangelauncher);
-        menu.setDisplayUseLogoEnabled(true);
+        menu.setDisplayHomeAsUpEnabled(true);
+
 
         serializer = new JSONSerializer(getApplicationContext(), "encoded_contact_info.json", new String[] {"code"});
         boolean successfulLoad = ObtainJSONObject();
@@ -86,7 +83,6 @@ public class SetContactActivity extends ActionBarActivity {
 
 
         mSetInfoButton = (Button) findViewById(R.id.set_button);
-        mSetInfoButton.setTypeface(type);
         mSetInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,25 +158,5 @@ public class SetContactActivity extends ActionBarActivity {
             return false;
         }
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_set_contact, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
